@@ -11,6 +11,7 @@
 ```bash
 ./another-vantage [option] <category> [parameter]
 ```
+```text
 用法：
 选项    
 -h, --help  显示帮助
@@ -29,6 +30,7 @@ charge 显示充电配置状态
 lid 显示开盖开机状态
 power 显示USB供电状态
 io 显示IO开关状态
+```
 
 示例：
 ```bash
