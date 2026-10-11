@@ -6,6 +6,37 @@
 
 一款在Linux上实现部分 Lenovo Vantage 的工具。适用于拯救者，小新，Think等联想设备。
 
+支持TUI与GUI两种呈现方式与命令行调用。
+命令行调用示例：
+```bash
+./another-vantage [option] <category> [parameter]
+```
+用法：
+选项    
+-h, --help  显示帮助
+-v, --version  显示版本信息并退出
+
+分类
+--info  显示所有基本信息
+--config  显示当前配置文件状态
+--firmware 检查BIOS更新
+
+参数
+model 显示型号与SN
+spec 显示参数信息
+performance 显示性能配置状态
+charge 显示充电配置状态
+lid 显示开盖开机状态
+power 显示USB供电状态
+io 显示IO开关状态
+
+示例：
+```bash
+➜  ./another-vantage --info model
+Another Vantage ver 0.1.0
+Device Model: ThinkBook G4+ IAP
+```
+
 期望实现功能：
 - [ ] 机器基本信息
     - [ ]  机型与序列号读取
@@ -39,4 +70,3 @@
 - [ ] BIOS固件版本检查更新
 - [ ] 高级功能
     - [ ] 手动变更TDP，显卡核心与显存功率墙与频率
-    - [ ] 
