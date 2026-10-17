@@ -127,6 +127,21 @@ Device Model: ThinkBook 16 G4+ IAP
 - [ ] 高级功能
     - [ ] 手动变更 TDP、显卡核心与显存功率墙与频率（⚠️ 风险高，最后做）
 
+## 从源码构建
+
+需要 Rust stable 与 `cargo`。本会话把工具链装在工作区 `.toolchain/`（不污染系统；细节见 `docs/HANDOFF.md`）。
+
+```bash
+cargo build --release
+cargo test
+
+./target/release/another-vantage --info model
+./target/release/another-vantage --info spec --json
+sudo ./target/release/another-vantage --info model   # SN 等特权读需要 root/sudo
+```
+
+当前只读 CLI 已可用；写入、TUI、GUI 尚未实现。
+
 ## 设计原则
 
 1. **能力探测优先**：启动扫描已知节点，产出“本机支持什么”；不支持项显示明确原因，不静默留白。
@@ -134,15 +149,15 @@ Device Model: ThinkBook 16 G4+ IAP
 3. **写后回读**：任何写入都必须回读断言；被 EC/固件覆盖时明确提示。
 4. **最小特权**：普通读取不用 root；特权读取提示 sudo；写入必须 root；不引入常驻 daemon。
 5. **不做内核模块、不做 BIOS 刷写、不写任意 BIOS 属性**：BIOS 设置只允许 allowlist。
-6. **语言无关的数据层**：CLI/TUI/GUI 共用同一套能力模型。
+6. **前端与数据层解耦**：CLI/TUI/GUI 共用同一套能力模型。
 
 ## 开发状态
 
 - [x] 21CY 实机接口探测（见 `docs/probe-21CY.md`）
 - [x] 竞品功能核实
 - [x] CLI 只读方案与特性矩阵
-- [ ] 语言选型（Rust / Python）与 GUI 时机
-- [ ] 阶段 1：只读 CLI
+- [x] 语言选型：Rust（GUI 时机待定）
+- [x] 阶段 1：只读 CLI 初版（`--info` / `--config` / `--firmware` + `--json`）
 - [ ] 阶段 2：监视
 - [ ] 阶段 3：写入
 - [ ] 阶段 4：TUI

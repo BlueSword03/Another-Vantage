@@ -21,7 +21,7 @@
 | 硬盘温度 | NVMe 由 `nvme` 驱动直接提供 hwmon（实测 27.85 °C），不需要 `drivetemp` |
 | BIOS 更新 | `fwupdmgr get-updates` 无更新；BIOS1 / System Firmware 列为“固件更新不可用” |
 | PPD | `power-profiles-daemon` active，ActiveProfile=`performance`，PlatformDriver=`platform_profile` |
-| Rust | 未安装；`cc/gcc/make/pkg-config` 可用 |
+| Rust | 系统未安装；本会话把 stable 1.99.1 装入仓库 `.toolchain/`（`RUSTUP_HOME`/`CARGO_HOME`，不污染系统）；`cc/gcc/make/pkg-config` 可用 |
 
 ## 1. 运行环境
 
@@ -293,7 +293,7 @@ fwupdmgr get-updates
 
 | 项 | 状态 |
 |---|---|
-| Rust | `rustc` / `cargo` / `rustup` 均无；`~/.cargo`、`~/.rustup` 无 |
+| Rust | 系统未装；本会话把 stable 1.99.1 装入仓库 `.toolchain/`（`RUSTUP_HOME`/`CARGO_HOME`），不污染系统 |
 | Python | 3.14.4；`gi`、`PyQt6`、`rich` 可用；`PyQt5`、`textual` 缺失 |
 | GTK4 | 运行时 typelib 缺失（`Gtk 4.0` / `Adw 1` 不可导入）；`pkg-config gtk4`、`libadwaita-1` 缺失 |
 | C 工具链 | `cc`、`gcc`、`make`、`pkg-config` 可用；`clang` 无 |

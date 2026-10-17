@@ -127,6 +127,21 @@ Device Model: ThinkBook 16 G4+ IAP
 - [ ] Advanced
     - [ ] Manual TDP, GPU core/VRAM power limits and clocks (⚠️ risky; last)
 
+## Building from source
+
+Requires Rust stable and `cargo`. This session installed the toolchain under `.toolchain/` in the workspace (no system changes; see `docs/HANDOFF.md`).
+
+```bash
+cargo build --release
+cargo test
+
+./target/release/another-vantage --info model
+./target/release/another-vantage --info spec --json
+sudo ./target/release/another-vantage --info model   # serial and other privileged reads
+```
+
+The read-only CLI works today; writes, TUI, and GUI are not implemented yet.
+
 ## Design principles
 
 1. **Capability probing first** — scan known interfaces, build a “what this machine supports” table; show explicit reasons for unsupported items.
@@ -134,15 +149,15 @@ Device Model: ThinkBook 16 G4+ IAP
 3. **Read back after writing** — every write is verified; if EC/firmware overrides it, say so.
 4. **Least privilege** — normal reads need no root; privileged reads prompt for sudo; writes require root; no resident daemon.
 5. **No kernel modules, no BIOS flashing, no arbitrary BIOS writes** — BIOS settings are allowlisted only.
-6. **Language-neutral data layer** — CLI/TUI/GUI share the same capability model.
+6. **Frontend/data-layer decoupling** — CLI/TUI/GUI share the same capability model.
 
 ## Development status
 
 - [x] 21CY hardware probing (`docs/probe-21CY.md`)
 - [x] Competitor feature verification
 - [x] Read-only CLI design and feature matrix
-- [ ] Language choice (Rust / Python) and GUI timing
-- [ ] Phase 1: read-only CLI
+- [x] Language choice: Rust (GUI timing still open)
+- [x] Phase 1: initial read-only CLI (`--info` / `--config` / `--firmware` + `--json`)
 - [ ] Phase 2: monitoring
 - [ ] Phase 3: writes
 - [ ] Phase 4: TUI
