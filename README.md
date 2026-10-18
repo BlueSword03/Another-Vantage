@@ -6,7 +6,9 @@
 
 一款在 Linux 上实现部分 Lenovo Vantage 功能的工具。适用于拯救者、小新、Think 等联想设备。
 
-**当前状态：规划中，代码未开工。** 第一版只做 **CLI 只读**（`--info` / `--config` / `--firmware`），写入调节后置。
+> **当前 CLI 只做读取**：所有命令只输出一次当前硬件/配置状态快照，**不写入任何设置，也不做参数监控**（没有轮询、没有后台进程、没有实时刷新）。写入与监视属后续阶段。
+
+**当前状态：只读 CLI 已可用**（`--info` / `--config` / `--firmware`，中英双语输出）；写入、TUI、GUI 未实现。
 支持矩阵以开发机 **ThinkBook 16 G4+ IAP（21CY）** 实测为准；其他机型标“未验证”。
 
 ## 使用
@@ -28,6 +30,7 @@
   --json        机器可读输出
   --no-color    禁用颜色
   --verbose     详细日志
+  --lang        输出语言：auto（默认，按 LANG/LC_ALL）/ zh / en
   --version     显示版本
   --help        显示帮助
 ```
@@ -35,7 +38,8 @@
 说明：
 
 - `--info` 不带子项 ⇒ 显示全部基本信息；`--config` 不带子项 ⇒ 显示全部配置状态。
-- 先实现读取，**写入尚未实现**。后续写入计划使用 `--set KEY=VALUE`（如 `--set performance=quiet`），并补 `--dry-run` / `--yes`。
+- 本 CLI 只读取，**写入与参数监控均尚未实现**。后续写入计划使用 `--set KEY=VALUE`（如 `--set performance=quiet`），并补 `--dry-run` / `--yes`；参数监视属阶段 2。
+- 输出语言用 `--lang auto|zh|en`；`auto`（默认）读取 `LC_ALL`/`LC_MESSAGES`/`LANG`（`zh*` → 中文，其余 → 英语）。JSON 的键固定为英文，`reason`/`hint` 文案随语言变化。
 - 部分读取需要管理员权限：SN（`product_serial`）、BIOS 当前值（`thinklmi/*/current_value`）、RAPL 能耗。遇到权限不足时会提示：
 
 ```text

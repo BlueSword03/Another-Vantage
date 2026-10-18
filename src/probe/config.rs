@@ -1,6 +1,7 @@
 use serde_json::{json, Value};
 
 use super::parse_charge_types;
+use crate::i18n::{t, t_args, Msg};
 use crate::sysfs::{field, field_bool, field_num, unsupported, Read, Sysfs};
 
 const IO_ALLOWLIST: [&str; 10] = [
@@ -28,11 +29,9 @@ pub fn performance(sys: &Sysfs) -> Value {
         "platform_profile": field(sys.read_trim("/sys/firmware/acpi/platform_profile")),
         "choices": choices,
         "provider": field(sys.read_trim("/sys/class/platform-profile/platform-profile-0/name")),
-        "bios_performance_enhanced": unsupported(
-            "21CY 的 thinklmi 未导出性能增强属性；请在 BIOS 中查看，Linux 侧不可读写"
-        ),
+        "bios_performance_enhanced": unsupported(t(Msg::BiosEnhancedNote)),
         "power_profiles_daemon": ppd_status(),
-        "note": "PPD active 时优先通过 power-profiles-daemon 设置，避免直接写 sysfs 造成状态不一致",
+        "note": t(Msg::PpdNote),
     })
 }
 
@@ -49,7 +48,7 @@ fn ppd_status() -> Value {
                 "manages_platform_profile": state == "active",
             })
         }
-        Err(e) => unsupported(&format!("无法检测 power-profiles-daemon: {e}")),
+        Err(e) => unsupported(&t_args(Msg::PpdErr, &[("e", &e.to_string())])),
     }
 }
 
@@ -60,7 +59,7 @@ pub fn charge(sys: &Sysfs) -> Value {
         .filter(|n| n.starts_with("BAT"))
         .collect();
     if bats.is_empty() {
-        return json!({"battery": unsupported("未发现 BAT* 设备")});
+        return json!({"battery": unsupported(t(Msg::NoBattery))});
     }
     let name = &bats[0];
     let b = format!("/sys/class/power_supply/{name}");
@@ -73,8 +72,8 @@ pub fn charge(sys: &Sysfs) -> Value {
         "charge_types": {"options": options, "active": active},
         "status": field(sys.read_trim(&format!("{b}/status"))),
         "capacity_percent": field_num(sys.read_trim(&format!("{b}/capacity"))),
-        "threshold": unsupported("无 charge_control_*_threshold；21CY 不支持充电阈值"),
-        "note": "conservation_mode 已 deprecated；写入应使用 charge_types（需 root）",
+        "threshold": unsupported(t(Msg::ChargeThreshold)),
+        "note": t(Msg::ChargeNote),
     })
 }
 
@@ -87,12 +86,12 @@ pub fn power(sys: &Sysfs) -> Value {
     json!({
         "ec_device": ec,
         "usb_charging": field_bool(sys.read_trim(&format!("{base}/usb_charging"))),
-        "usb_charge_threshold": unsupported("本机无阈值节点；仅支持开关"),
+        "usb_charge_threshold": unsupported(t(Msg::UsbThreshold)),
         "conservation_mode": field(sys.read_trim(&format!("{base}/conservation_mode"))),
         "camera_power": field_bool(sys.read_trim(&format!("{base}/camera_power"))),
         "fn_lock": field_bool(sys.read_trim(&format!("{base}/fn_lock"))),
         "fan_mode": field_num(sys.read_trim(&format!("{base}/fan_mode"))),
-        "note": "AlwaysOnUSB（thinklmi）与 usb_charging 可能控制同一硬件；写入时只能选一条路径",
+        "note": t(Msg::UsbNote),
     })
 }
 
@@ -107,18 +106,18 @@ pub fn lid(sys: &Sysfs) -> Value {
                 "flip_to_start": if flip {
                     field_bool(sys.read_trim(&format!("{base}/flip_to_start")))
                 } else {
-                    unsupported("本机无 flip_to_start 节点")
+                    unsupported(t(Msg::LidFlipMissing))
                 },
                 "instant_boot": if instant {
                     field_bool(sys.read_trim(&format!("{base}/instant_boot")))
                 } else {
-                    unsupported("本机无 instant_boot 节点")
+                    unsupported(t(Msg::LidInstantMissing))
                 },
                 "supported": flip || instant,
-                "note": "开盖开机是机型相关能力；21CY 不支持",
+                "note": t(Msg::LidNote),
             })
         }
-        None => json!({"supported": false, "reason": "未找到 VPC2004 设备"}),
+        None => json!({"supported": false, "reason": t(Msg::NoVpc)}),
     }
 }
 
@@ -152,7 +151,7 @@ pub fn io(sys: &Sysfs) -> Value {
         "backend": base,
         "io_allowlist": IO_ALLOWLIST,
         "attributes": list,
-        "note": "current_value 为 0600，读值/写值都需要 root；不要写 SecureBoot/DeviceGuard 等非 IO 项",
+        "note": t(Msg::IoNote),
     })
 }
 

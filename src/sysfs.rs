@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{json, Value};
 
+use crate::i18n::{t, Msg};
+
 /// Read-only view over a sysfs/procfs tree. The root is configurable so the
 /// same probes can run against fixtures in tests.
 #[derive(Clone, Debug)]
@@ -104,9 +106,9 @@ impl Sysfs {
 pub fn field(r: Read) -> Value {
     match r {
         Read::Ok(s) => json!(s),
-        Read::NotFound => json!({"value": null, "reason": "节点不存在"}),
+        Read::NotFound => json!({"value": null, "reason": t(Msg::NodeMissing)}),
         Read::Denied => {
-            json!({"value": null, "reason": "需要管理员权限", "hint": "请使用 root 或 sudo 执行"})
+            json!({"value": null, "reason": t(Msg::NeedRoot), "hint": t(Msg::UseRoot)})
         }
         Read::Err(e) => json!({"value": null, "reason": e}),
     }
@@ -116,7 +118,7 @@ pub fn field_num(r: Read) -> Value {
     match r {
         Read::Ok(s) => match s.trim().parse::<i64>() {
             Ok(n) => json!(n),
-            Err(_) => json!({"value": s, "reason": "无法解析为数字"}),
+            Err(_) => json!({"value": s, "reason": t(Msg::NotNumber)}),
         },
         other => field(other),
     }
@@ -127,7 +129,7 @@ pub fn field_bool(r: Read) -> Value {
         Read::Ok(s) => match s.trim().to_ascii_lowercase().as_str() {
             "1" | "y" | "yes" | "true" | "enabled" | "enable" | "on" => json!(true),
             "0" | "n" | "no" | "false" | "disabled" | "disable" | "off" => json!(false),
-            _ => json!({"value": s, "reason": "无法解析为布尔值"}),
+            _ => json!({"value": s, "reason": t(Msg::NotBool)}),
         },
         other => field(other),
     }

@@ -4,6 +4,7 @@ use serde_json::{json, Value};
 
 use super::hardware;
 use super::parse_charge_types;
+use crate::i18n::{t, Msg};
 use crate::sysfs::{field, field_num, fmt_bytes, unsupported, Read, Sysfs};
 
 pub fn spec(sys: &Sysfs) -> Value {
@@ -74,7 +75,7 @@ fn memory(sys: &Sysfs) -> Value {
                 "used": fmt_bytes(total.saturating_sub(avail)),
                 "swap_total": fmt_bytes(swap_total),
                 "swap_free": fmt_bytes(swap_free),
-                "speed_part_form": unsupported("需要 dmidecode；本机无免 root 通路"),
+                "speed_part_form": unsupported(t(Msg::DmiSpeed)),
             })
         }
         other => field(other),

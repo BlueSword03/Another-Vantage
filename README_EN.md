@@ -6,7 +6,9 @@
 
 A tool that brings part of Lenovo Vantage to Linux — for Legion, IdeaPad and Think PCs.
 
-**Status: planning; no code yet.** The first release is a **read-only CLI** (`--info` / `--config` / `--firmware`); writes come later.
+> **The CLI is read-only today**: every command prints a one-shot snapshot of the current hardware/configuration state. It **never writes settings and does not monitor parameters** (no polling, no background process, no live refresh). Writes and monitoring come in later phases.
+
+**Status: read-only CLI works** (`--info` / `--config` / `--firmware`, bilingual output); writes, TUI and GUI are not implemented.
 The support matrix below reflects the development machine, **ThinkBook 16 G4+ IAP (21CY)**; other models are marked “unverified”.
 
 ## Usage
@@ -28,6 +30,7 @@ Options
   --json        Machine-readable output
   --no-color    Disable colors
   --verbose     Verbose logging
+  --lang        Output language: auto (default, follows LANG/LC_ALL) / zh / en
   --version
   --help
 ```
@@ -35,7 +38,8 @@ Options
 Notes:
 
 - `--info` without an item prints everything; `--config` without an item prints all configuration states.
-- Reads are implemented first; **writes are not implemented yet**. Planned syntax: `--set KEY=VALUE` (e.g. `--set performance=quiet`), plus `--dry-run` / `--yes`.
+- The CLI only reads; **writes and parameter monitoring are not implemented yet**. Planned syntax: `--set KEY=VALUE` (e.g. `--set performance=quiet`), plus `--dry-run` / `--yes`; monitoring is phase 2.
+- Choose output language with `--lang auto|zh|en`; `auto` (default) reads `LC_ALL`/`LC_MESSAGES`/`LANG` (`zh*` → Chinese, otherwise English). JSON keys stay English; `reason`/`hint` text follows the language.
 - Some reads require root: serial number (`product_serial`), BIOS current values (`thinklmi/*/current_value`), RAPL energy. On `EACCES` the CLI prints:
 
 ```text

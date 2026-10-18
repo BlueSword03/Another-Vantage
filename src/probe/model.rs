@@ -1,5 +1,6 @@
 use serde_json::{json, Value};
 
+use crate::i18n::{t, Msg};
 use crate::sysfs::{field, Read, Sysfs};
 
 const DMI: &str = "/sys/devices/virtual/dmi/id";
@@ -13,7 +14,7 @@ pub fn model(sys: &Sysfs) -> Value {
                 .parse::<u32>()
                 .ok()
                 .and_then(chassis_name)
-                .unwrap_or("未知");
+                .unwrap_or(t(Msg::Unknown));
             json!(format!("{s} ({name})"))
         }
         other => field(other),

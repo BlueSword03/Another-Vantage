@@ -1,5 +1,7 @@
 use serde_json::{Map, Value};
 
+use crate::i18n::{t, Msg};
+
 /// Human-readable rendering of the section values. Field objects of the shape
 /// `{value, reason?, hint?}` are rendered inline with their note.
 pub fn render(sections: &[(String, Value)], color: bool) -> String {
@@ -90,7 +92,7 @@ fn is_field(map: &Map<String, Value>) -> bool {
 fn field_text(map: &Map<String, Value>) -> String {
     let value = map.get("value").unwrap_or(&Value::Null);
     let mut s = if value.is_null() {
-        "不可用".to_string()
+        t(Msg::Unavailable).to_string()
     } else {
         scalar(value)
     };
@@ -105,7 +107,7 @@ fn field_text(map: &Map<String, Value>) -> String {
 
 fn scalar(v: &Value) -> String {
     match v {
-        Value::Null => "未知".into(),
+        Value::Null => t(Msg::Unknown).into(),
         Value::Bool(b) => b.to_string(),
         Value::Number(n) => n.to_string(),
         Value::String(s) => s.clone(),

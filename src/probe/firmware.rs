@@ -1,5 +1,6 @@
 use serde_json::{json, Value};
 
+use crate::i18n::{t, Msg};
 use crate::sysfs::{field, Sysfs};
 
 const DMI: &str = "/sys/devices/virtual/dmi/id";
@@ -11,7 +12,7 @@ pub fn firmware(sys: &Sysfs) -> Value {
         "ec_firmware_release": field(sys.read_trim(&format!("{DMI}/ec_firmware_release"))),
         "fwupd": {
             "available": which("fwupdmgr").is_some(),
-            "note": "运行 `fwupdmgr get-updates` 查看可用更新；21CY 的 BIOS1/System Firmware 标记为“固件更新不可用”，无 LVFS 刷写路径",
+            "note": t(Msg::FirmwareNote),
         },
     })
 }

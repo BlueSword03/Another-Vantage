@@ -2,6 +2,8 @@ use std::path::PathBuf;
 
 use clap::{ArgGroup, Parser};
 
+use crate::i18n::{t_args, LangArg, Msg};
+
 #[derive(Parser, Debug)]
 #[command(
     name = "another-vantage",
@@ -15,31 +17,35 @@ use clap::{ArgGroup, Parser};
         .args(["info", "config", "firmware"])
 ))]
 pub struct Cli {
-    /// 读取基本信息 (all/model/spec)
+    /// Read basic information (all/model/spec)
     #[arg(long, value_name = "ITEM", num_args = 0..=1, default_missing_value = "all")]
     pub info: Option<String>,
 
-    /// 读取硬件配置状态 (all/performance/charge/lid/power/io)
+    /// Read hardware configuration state (all/performance/charge/lid/power/io)
     #[arg(long, value_name = "ITEM", num_args = 0..=1, default_missing_value = "all")]
     pub config: Option<String>,
 
-    /// 检查 BIOS 版本与固件更新可用性
+    /// Check BIOS version and firmware update availability
     #[arg(long)]
     pub firmware: bool,
 
-    /// 机器可读 JSON 输出
+    /// Machine-readable JSON output
     #[arg(long)]
     pub json: bool,
 
-    /// 禁用颜色
+    /// Disable colors
     #[arg(long = "no-color")]
     pub no_color: bool,
 
-    /// 详细日志
+    /// Verbose diagnostics
     #[arg(long)]
     pub verbose: bool,
 
-    /// 用于测试的 sysfs 根目录（隐藏选项）
+    /// Output language (auto follows LANG/LC_ALL)
+    #[arg(long, value_enum, default_value_t = LangArg::Auto)]
+    pub lang: LangArg,
+
+    /// sysfs root for testing (hidden option)
     #[arg(long, hide = true, default_value = "/")]
     pub sysfs_root: PathBuf,
 }
@@ -94,16 +100,8 @@ pub fn parse_item(group: Group, raw: &str) -> Result<Item, String> {
         (Group::Config, "lid") => Item::Lid,
         (Group::Config, "power") => Item::Power,
         (Group::Config, "io") => Item::Io,
-        (Group::Info, other) => {
-            return Err(format!(
-                "未知的 --info 子项 “{other}”；可用: all, model, spec（performance/charge/lid/power/io 属于 --config）"
-            ))
-        }
-        (Group::Config, other) => {
-            return Err(format!(
-                "未知的 --config 子项 “{other}”；可用: all, performance, charge, lid, power, io（model/spec 属于 --info）"
-            ))
-        }
+        (Group::Info, other) => return Err(t_args(Msg::UnknownInfoItem, &[("other", other)])),
+        (Group::Config, other) => return Err(t_args(Msg::UnknownConfigItem, &[("other", other)])),
         (Group::Firmware, _) => Item::All,
     };
     Ok(item)

@@ -1,25 +1,31 @@
 mod cli;
+mod i18n;
 mod output;
 mod probe;
 mod sysfs;
 
 use std::io::IsTerminal;
 
-use clap::Parser;
+use clap::FromArgMatches;
 use serde_json::{json, Map, Value};
 
 use cli::{parse_item, Cli, Group, Item};
+use i18n::Msg;
 use sysfs::Sysfs;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
-    let cli = Cli::parse();
+    let argv: Vec<String> = std::env::args().collect();
+    i18n::init(i18n::resolve(i18n::pre_scan(&argv)));
+    let matches = i18n::command().get_matches_from(argv);
+    let cli = Cli::from_arg_matches(&matches).unwrap_or_else(|e| e.exit());
+    i18n::init(i18n::resolve(cli.lang));
     let group = cli.group();
     let item = match parse_item(group, cli.raw_item()) {
         Ok(i) => i,
         Err(e) => {
-            eprintln!("错误：{e}");
+            eprintln!("{}", i18n::t_args(Msg::ErrorPrefix, &[("e", &e)]));
             std::process::exit(2);
         }
     };
