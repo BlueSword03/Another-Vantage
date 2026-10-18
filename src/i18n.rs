@@ -405,6 +405,25 @@ pub fn bool_text(b: bool) -> &'static str {
     }
 }
 
+/// Localized battery charge mode. Performance-profile values are intentionally
+/// not translated: their Chinese names differ per model
+/// (性能模式 / 极客模式 / 野兽模式 …), so the raw kernel value is kept.
+pub fn charge_mode(v: &str) -> &str {
+    match current() {
+        Lang::Zh => charge_mode_zh(v).unwrap_or(v),
+        Lang::En => v,
+    }
+}
+
+fn charge_mode_zh(v: &str) -> Option<&'static str> {
+    Some(match v {
+        "Fast" => "快充",
+        "Standard" => "常规",
+        "Long_Life" => "养护",
+        _ => return None,
+    })
+}
+
 /// Fill `{name}` placeholders in a localized message.
 pub fn t_args(m: Msg, args: &[(&str, &str)]) -> String {
     let mut s = t(m).to_string();
@@ -560,5 +579,13 @@ mod tests {
     #[test]
     fn unknown_key_falls_back_to_itself() {
         assert!(label_zh("no_such_key").is_none());
+    }
+
+    #[test]
+    fn battery_charge_modes_are_named() {
+        assert_eq!(charge_mode_zh("Fast"), Some("快充"));
+        assert_eq!(charge_mode_zh("Standard"), Some("常规"));
+        assert_eq!(charge_mode_zh("Long_Life"), Some("养护"));
+        assert_eq!(charge_mode_zh("performance"), None);
     }
 }
