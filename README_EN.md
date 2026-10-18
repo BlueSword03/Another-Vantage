@@ -40,7 +40,6 @@ Notes:
 - `--info` without an item prints everything; `--config` without an item prints all configuration states.
 - The CLI only reads; **writes and parameter monitoring are not implemented yet**. Planned syntax: `--set KEY=VALUE` (e.g. `--set performance=quiet`), plus `--dry-run` / `--yes`; monitoring is phase 2.
 - Choose output language with `--lang auto|zh|en`; `auto` (default) reads `LC_ALL`/`LC_MESSAGES`/`LANG` (`zh*` → Chinese, otherwise English). Human-readable output also **translates field labels** (`board_name` → `主板型号`, `temperature_c` → `温度 (℃)`); `--json` keys **always stay English** and only `reason`/`hint` text follows the language, so scripts keep working.
-- Battery charge modes display as `快充` / `常规` / `养护` in Chinese (`Fast` / `Standard` / `Long_Life`; `--json` keeps the raw values). **Performance profile values stay raw** (`performance` / `balanced` / `low-power`) because their Chinese names differ per model (性能模式 / 极客模式 / 野兽模式 …).
 - Some reads require root: serial number (`product_serial`), BIOS current values (`thinklmi/*/current_value`), RAPL energy. On `EACCES` the CLI prints:
 
 ```text

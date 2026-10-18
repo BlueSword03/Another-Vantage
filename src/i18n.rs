@@ -406,8 +406,8 @@ pub fn bool_text(b: bool) -> &'static str {
 }
 
 /// Localized battery charge mode. Performance-profile values are intentionally
-/// not translated: their Chinese names differ per model
-/// (性能模式 / 极客模式 / 野兽模式 …), so the raw kernel value is kept.
+/// not translated: their Chinese names differ per model,
+/// so the raw kernel value is kept.
 pub fn charge_mode(v: &str) -> &str {
     match current() {
         Lang::Zh => charge_mode_zh(v).unwrap_or(v),
