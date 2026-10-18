@@ -79,6 +79,13 @@ impl Sysfs {
         self.path(p).exists()
     }
 
+    /// Resolve symlinks under the sysfs root (used to find a device's PCI ancestor).
+    pub fn canonical(&self, p: &str) -> Option<String> {
+        fs::canonicalize(self.path(p))
+            .ok()
+            .map(|pb| pb.to_string_lossy().into_owned())
+    }
+
     /// Sorted directory entries (names only). Missing/unreadable dirs are empty.
     pub fn entries(&self, p: &str) -> Vec<String> {
         let mut v: Vec<String> = match fs::read_dir(self.path(p)) {

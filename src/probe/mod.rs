@@ -1,5 +1,6 @@
 pub mod config;
 pub mod firmware;
+pub mod hardware;
 pub mod model;
 pub mod spec;
 

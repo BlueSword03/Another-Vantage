@@ -74,7 +74,7 @@ Device Model: ThinkBook 16 G4+ IAP
 | 电池厂商/型号/容量/类型/健康度 | ✅ | LGES / L21L4PD8 / 65.48 Wh / Li-ion / 92.2% / 165 cycles |
 | 屏幕尺寸/型号/分辨率 | ✅ | EDID：CSO 5644，34×22 cm，2560×1600 |
 | 主板/BIOS/芯片组 | ✅ | LNVNB161216 / HYCN54WW |
-| 声卡/网卡型号/特性 | ✅ | AX210 / I219-V |
+| 声卡/网卡型号/特性 | ✅ | Alder Lake PCH-P HDA / AX210 / I219-V |
 | CPU 温度/占用 | ✅ | coretemp + `/proc/stat` |
 | GPU 温度/占用 | ❌ | 核显无温度 sysfs；占用需 `intel_gpu_top`/PMU |
 | 内存温度 | ❌ | 无 DIMM 通路 |
@@ -105,8 +105,8 @@ Device Model: ThinkBook 16 G4+ IAP
         - [ ] 电池供应商、型号、容量、类型、健康度
         - [ ] 屏幕尺寸、型号、分辨率（EDID）
         - [ ] 主板型号、BIOS 版本、芯片组型号
-        - [ ] 声卡型号
-        - [ ] 网卡型号、特性支持
+        - [x] 声卡型号（lspci 型号、平台/PCI 驱动、PCI ID）
+        - [x] 网卡型号与驱动（含无线标识；频段/速率等特性后续补充）
     - [ ] 简易性能监视
         - [ ] CPU 温度与占用率
         - [ ] GPU 温度与占用率（⚠️ 核显可能不可得）

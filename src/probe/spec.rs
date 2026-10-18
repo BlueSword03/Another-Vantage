@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
+use super::hardware;
 use super::parse_charge_types;
 use crate::sysfs::{field, field_num, fmt_bytes, unsupported, Read, Sysfs};
 
@@ -12,6 +13,8 @@ pub fn spec(sys: &Sysfs) -> Value {
         "storage": storage(sys),
         "battery": battery(sys),
         "display": display(sys),
+        "audio": hardware::audio(sys),
+        "network": hardware::network(sys),
         "thermal": thermal(sys),
     })
 }

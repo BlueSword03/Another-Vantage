@@ -74,7 +74,7 @@ Device Model: ThinkBook 16 G4+ IAP
 | Battery vendor / model / capacity / type / health | ✅ | LGES / L21L4PD8 / 65.48 Wh / Li-ion / 92.2% / 165 cycles |
 | Screen size / model / resolution | ✅ | EDID: CSO 5644, 34×22 cm, 2560×1600 |
 | Motherboard / BIOS / chipset | ✅ | LNVNB161216 / HYCN54WW |
-| Audio / network model & features | ✅ | AX210 / I219-V |
+| Audio / network model & features | ✅ | Alder Lake PCH-P HDA / AX210 / I219-V |
 | CPU temperature / utilization | ✅ | coretemp + `/proc/stat` |
 | GPU temperature / utilization | ❌ | No iGPU temperature sysfs; utilization needs `intel_gpu_top`/PMU |
 | Memory temperature | ❌ | No DIMM path |
@@ -105,8 +105,8 @@ Device Model: ThinkBook 16 G4+ IAP
         - [ ] Battery vendor, model, capacity, type, health
         - [ ] Screen size, model, resolution (EDID)
         - [ ] Motherboard, BIOS version, chipset
-        - [ ] Audio model
-        - [ ] Network model, feature support
+        - [x] Audio model (lspci model, platform/PCI driver, PCI ID)
+        - [x] Network model and driver (wireless flag; band/speed details later)
     - [ ] Simple monitoring
         - [ ] CPU temperature and utilization
         - [ ] GPU temperature and utilization (⚠️ may be unavailable on iGPU)
