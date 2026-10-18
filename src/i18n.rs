@@ -266,6 +266,145 @@ pub fn t(m: Msg) -> &'static str {
     m.text()
 }
 
+/// Human-facing field label for a JSON key. Unknown keys fall back to the key
+/// itself so new probes never render blank. JSON keys are never translated.
+pub fn label(key: &str) -> &str {
+    match current() {
+        Lang::Zh => label_zh(key).unwrap_or(key),
+        Lang::En => key,
+    }
+}
+
+fn label_zh(key: &str) -> Option<&'static str> {
+    Some(match key {
+        // sections and machine identity
+        "cpu" => "处理器",
+        "memory" => "内存",
+        "storage" => "存储",
+        "battery" => "电池",
+        "display" => "显示器",
+        "audio" => "声卡",
+        "network" => "网卡",
+        "thermal" => "传感器",
+        "vendor" => "厂商",
+        "product_name" => "产品名称",
+        "product_version" => "产品版本",
+        "product_family" => "产品系列",
+        "product_sku" => "产品 SKU",
+        "board_name" => "主板型号",
+        "board_version" => "主板版本",
+        "bios_version" => "BIOS 版本",
+        "bios_date" => "BIOS 日期",
+        "ec_firmware_release" => "EC 固件版本",
+        "chassis_type" => "机箱类型",
+        "serial" | "serial_number" => "序列号",
+        "uuid" => "UUID",
+        // cpu
+        "model" => "型号",
+        "model_name" => "型号名称",
+        "logical_cpus" => "逻辑处理器数",
+        "cores" => "物理核心数",
+        "siblings" => "同级线程数",
+        "hyper_threading" => "超线程",
+        // memory
+        "total" => "总量",
+        "available" => "可用",
+        "used" => "已用",
+        "swap_total" => "Swap 总量",
+        "swap_free" => "Swap 可用",
+        "speed_part_form" => "频率/型号/形态",
+        // storage
+        "name" => "名称",
+        "size" => "容量",
+        "rotational" => "机械硬盘",
+        "temperature_c" => "温度 (℃)",
+        // battery
+        "manufacturer" => "厂商",
+        "technology" => "电池类型",
+        "energy_full" => "当前满容量",
+        "energy_full_design" => "设计容量",
+        "health_percent" => "健康度 (%)",
+        "capacity_percent" => "容量 (%)",
+        "status" => "状态",
+        "cycle_count" => "循环次数",
+        "charge_types" => "充电模式",
+        "options" => "可选",
+        "active" => "当前",
+        "threshold" => "阈值",
+        // display
+        "connector" => "接口",
+        "resolution" => "分辨率",
+        "product_code" => "产品代码",
+        "size_cm" => "尺寸 (cm)",
+        "diagonal_inch" => "对角线 (英寸)",
+        // thermal
+        "temps" => "温度",
+        "fans" => "风扇",
+        "label" => "名称",
+        "celsius" => "温度 (℃)",
+        "rpm" => "转速 (RPM)",
+        // audio / network
+        "card" => "声卡",
+        "id" => "ID",
+        "platform_driver" => "平台驱动",
+        "pci_slot" => "PCI 地址",
+        "pci_id" => "PCI ID",
+        "pci_driver" => "PCI 驱动",
+        "class" => "类别",
+        "interface" => "接口",
+        "virtual" => "虚拟",
+        "driver" => "驱动",
+        "wireless" => "无线",
+        "operstate" => "链路状态",
+        "mac" => "MAC 地址",
+        "mtu" => "MTU",
+        "speed_mbps" => "速率 (Mbps)",
+        // performance
+        "platform_profile" => "平台性能档",
+        "choices" => "可选档位",
+        "provider" => "提供方",
+        "bios_performance_enhanced" => "BIOS 性能增强",
+        "power_profiles_daemon" => "PPD 服务",
+        "service" => "服务",
+        "state" => "状态",
+        "manages_platform_profile" => "管理平台性能档",
+        "note" => "说明",
+        // charge / power / lid
+        "ec_device" => "EC 设备",
+        "usb_charging" => "USB 充电",
+        "usb_charge_threshold" => "USB 充电阈值",
+        "conservation_mode" => "电池养护模式",
+        "camera_power" => "摄像头供电",
+        "fn_lock" => "Fn 锁定",
+        "fan_mode" => "风扇模式",
+        "flip_to_start" => "开盖开机",
+        "instant_boot" => "即时启动",
+        "supported" => "是否支持",
+        // io / firmware
+        "io" => "IO 开关",
+        "backend" => "后端",
+        "io_allowlist" => "IO 白名单",
+        "attributes" => "属性",
+        "display_name" => "显示名称",
+        "type" => "类型",
+        "possible_values" => "可选值",
+        "current_value" => "当前值",
+        "io_switch" => "IO 开关项",
+        "fwupd" => "fwupd",
+        _ => return None,
+    })
+}
+
+/// Localized boolean for human output (`true`/`false` vs `是`/`否`).
+pub fn bool_text(b: bool) -> &'static str {
+    match (current(), b) {
+        (Lang::Zh, true) => "是",
+        (Lang::Zh, false) => "否",
+        (Lang::En, true) => "true",
+        (Lang::En, false) => "false",
+    }
+}
+
 /// Fill `{name}` placeholders in a localized message.
 pub fn t_args(m: Msg, args: &[(&str, &str)]) -> String {
     let mut s = t(m).to_string();
@@ -376,5 +515,50 @@ mod tests {
     fn explicit_language_wins() {
         assert_eq!(resolve(LangArg::Zh), Lang::Zh);
         assert_eq!(resolve(LangArg::En), Lang::En);
+    }
+
+    #[test]
+    fn core_keys_have_nonempty_chinese_labels() {
+        for k in [
+            "board_name",
+            "bios_version",
+            "chassis_type",
+            "serial",
+            "cores",
+            "hyper_threading",
+            "swap_total",
+            "rotational",
+            "temperature_c",
+            "cycle_count",
+            "health_percent",
+            "charge_types",
+            "resolution",
+            "size_cm",
+            "diagonal_inch",
+            "celsius",
+            "rpm",
+            "pci_id",
+            "pci_slot",
+            "platform_driver",
+            "operstate",
+            "speed_mbps",
+            "platform_profile",
+            "bios_performance_enhanced",
+            "usb_charging",
+            "conservation_mode",
+            "flip_to_start",
+            "supported",
+            "io_allowlist",
+            "current_value",
+        ] {
+            let l = label_zh(k);
+            assert!(l.is_some(), "{k} has no zh label");
+            assert!(!l.unwrap().is_empty(), "{k} zh label is empty");
+        }
+    }
+
+    #[test]
+    fn unknown_key_falls_back_to_itself() {
+        assert!(label_zh("no_such_key").is_none());
     }
 }

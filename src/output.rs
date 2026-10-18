@@ -1,6 +1,6 @@
 use serde_json::{Map, Value};
 
-use crate::i18n::{t, Msg};
+use crate::i18n::{bool_text, label, t, Msg};
 
 /// Human-readable rendering of the section values. Field objects of the shape
 /// `{value, reason?, hint?}` are rendered inline with their note.
@@ -40,6 +40,7 @@ fn render_object(v: &Value, indent: usize, out: &mut String) {
 
 fn render_entry(key: &str, v: &Value, indent: usize, out: &mut String) {
     let p = pad(indent);
+    let key = label(key);
     match v {
         Value::Object(map) if is_field(map) => {
             out.push_str(&format!("{p}{key}: {}\n", field_text(map)));
@@ -62,7 +63,7 @@ fn render_bullet(v: &Value, indent: usize, out: &mut String) {
             let mut iter = map.iter();
             match iter.next() {
                 Some((k, v)) if !matches!(v, Value::Object(_) | Value::Array(_)) => {
-                    out.push_str(&format!("{p}- {k}: {}\n", scalar(v)));
+                    out.push_str(&format!("{p}- {}: {}\n", label(k), scalar(v)));
                 }
                 Some((k, v)) => {
                     out.push_str(&format!("{p}-\n"));
@@ -108,7 +109,7 @@ fn field_text(map: &Map<String, Value>) -> String {
 fn scalar(v: &Value) -> String {
     match v {
         Value::Null => t(Msg::Unknown).into(),
-        Value::Bool(b) => b.to_string(),
+        Value::Bool(b) => bool_text(*b).into(),
         Value::Number(n) => n.to_string(),
         Value::String(s) => s.clone(),
         other => other.to_string(),

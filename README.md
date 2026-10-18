@@ -39,7 +39,7 @@
 
 - `--info` 不带子项 ⇒ 显示全部基本信息；`--config` 不带子项 ⇒ 显示全部配置状态。
 - 本 CLI 只读取，**写入与参数监控均尚未实现**。后续写入计划使用 `--set KEY=VALUE`（如 `--set performance=quiet`），并补 `--dry-run` / `--yes`；参数监视属阶段 2。
-- 输出语言用 `--lang auto|zh|en`；`auto`（默认）读取 `LC_ALL`/`LC_MESSAGES`/`LANG`（`zh*` → 中文，其余 → 英语）。JSON 的键固定为英文，`reason`/`hint` 文案随语言变化。
+- 输出语言用 `--lang auto|zh|en`；`auto`（默认）读取 `LC_ALL`/`LC_MESSAGES`/`LANG`（`zh*` → 中文，其余 → 英语）。人类可读输出中的**字段名也会翻译**（如 `board_name` → `主板型号`、`temperature_c` → `温度 (℃)`）；`--json` 的键**始终为英文**，只有 `reason`/`hint` 文案随语言变化，便于脚本解析。
 - 部分读取需要管理员权限：SN（`product_serial`）、BIOS 当前值（`thinklmi/*/current_value`）、RAPL 能耗。遇到权限不足时会提示：
 
 ```text
